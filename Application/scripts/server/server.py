@@ -4,6 +4,7 @@ from aiohttp import web, request
 import sys
 sys.path.insert(0, 'Application')
 from logger.log import MyLogging
+from scripts.logic.logic import HandlerServer
 
 
 app = web.Application()
