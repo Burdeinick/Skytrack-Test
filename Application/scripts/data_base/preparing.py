@@ -255,10 +255,8 @@ def main():
     db.add_book()
     db.create_shop()
     db.add_shop()
-
     db.create_assortiment()
     db.add_assortiment()
-
     db.create_order_all()
     db.create_orderitem()
 

@@ -13,7 +13,7 @@ class StatusResponse:
     """
     def __init__(self):
         """The constructor create the statuses."""
-        pass
+        self.invalid_data = {"Error": "Invalid data accepted"}
 
 
 class Checker:
@@ -25,17 +25,34 @@ class Checker:
         """ """
         pass
 
-    def valid_data(self):
-        """The method checks validity data of request."""
+    def valid_get_user(self, data: dict) -> bool:
+        """The method checks validity data of request
+        get_user if it valid return True else False.
 
+        """
+        try:
+            id_user = str(data.get("id_user")) if "id_user" in data else None 
+            if id_user and id_user.isalnum():
+                return True
+
+        except Exception:
+            super_logger.error('Error valid_get_user', exc_info=True)
 
 
 class HandlerServer:
     """The class can to process requests of server."""
-    def __init__(self):
+    def __init__(self, data: dict):
         """ """
         self.stat_resp = StatusResponse()
+        self.checker = Checker()
+        self.data = data
 
-    def hand_get_user(self):
+    async def hand_get_user(self):
         """The method handle 'get_user' of server."""
+        data_valid = self.checker.valid_get_user(self.data)
+        if data_valid:
+            pass
+        else:
+            return self.stat_resp.invalid_data
+
 

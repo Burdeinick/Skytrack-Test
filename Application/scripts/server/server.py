@@ -18,10 +18,11 @@ async def get_user(request):
     """The method handle 'get_user' route requests."""
     try:
         async with aiohttp.ClientSession() as session:
-            req = await request.post()
-            id_user = req.get('id_user')
+            data = await request.post()
+            get_user = HandlerServer(data)
+            response = await get_user.hand_get_user()
 
-        return web.json_response({"Ok": True})
+        return web.json_response(response)
 
     except Exception:
         super_logger.error('Error get_user', exc_info=True)
