@@ -1,5 +1,6 @@
 import aiohttp
 from aiohttp import web, request
+
 import sys
 sys.path.insert(0, 'Application')
 from logger.log import MyLogging
@@ -13,13 +14,18 @@ super_logger = MyLogging().setup_logger('server',
 
 
 async def get_user(request):
+    """The method handle 'get_user' route requests."""
     try:
         async with aiohttp.ClientSession() as session:
-            pass
-        return web.json_response({'ok': True})
+            req = await request.post()
+            id_user = req.get('id_user')
+
+        return web.json_response({"Ok": True})
 
     except Exception:
         super_logger.error('Error get_user', exc_info=True)
+
+
 
 
 async def get_order_user(request):
