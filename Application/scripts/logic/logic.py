@@ -37,5 +37,5 @@ class HandlerServer:
         self.stat_resp = StatusResponse()
 
     def hand_get_user(self):
-        """The method handle 'get_user' of server.""""
+        """The method handle 'get_user' of server."""
 

@@ -154,6 +154,73 @@ class PreparDb:
         except Exception:
             super_logger.error('Error add_shop', exc_info=True)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def create_assortiment(self):
+        """This method creates the 'Assortiment' table."""
+        try:
+            with self.connect_db:
+                request = """CREATE TABLE IF NOT EXISTS Assortiment
+                             (id_assortiment INTEGER PRIMARY KEY
+                             AUTOINCREMENT NOT NULL,
+                             id_book INTEGER NOT NULL,
+                             id_shop INTEGER NOT NULL,
+                             FOREIGN KEY (id_book)
+                             REFERENCES Book(id_book),
+                             FOREIGN KEY (id_shop)
+                             REFERENCES Shop(id_shop)
+                             )"""
+
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+
+        except Exception:
+            super_logger.error('Error create_assortiment', exc_info=True)
+
+    def add_assortiment(self):
+        """This method fills in the 'Assortiment' table. """
+        try:
+            with self.connect_db:
+                request = """
+                          INSERT INTO Assortiment
+                          (id_book, id_shop)
+                          VALUES
+                          (1, 1),
+                          (1, 2),
+                          (1, 3),
+                          (2, 2),
+                          (2, 3),
+                          (3, 1)
+                          """
+
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+
+        except Exception:
+            super_logger.error('Error add_assortiment', exc_info=True)
+
     def create_order_all(self):
         """This method creates the 'OrderAll' table."""
         try:
@@ -212,6 +279,10 @@ def main():
     db.add_book()
     db.create_shop()
     db.add_shop()
+
+    db.create_assortiment()
+    db.add_assortiment()
+
     db.create_order_all()
     db.create_orderitem()
 
