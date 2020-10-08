@@ -154,30 +154,6 @@ class PreparDb:
         except Exception:
             super_logger.error('Error add_shop', exc_info=True)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def create_assortiment(self):
         """This method creates the 'Assortiment' table."""
         try:
