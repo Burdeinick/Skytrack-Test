@@ -39,7 +39,6 @@ class PreparDb:
         except Exception:
             super_logger.error('Error foreign_keys_on', exc_info=True)
 
-
     def create_user(self):
         """This method creates the 'user' table."""
         try:
@@ -64,9 +63,10 @@ class PreparDb:
             with self.connect_db:
                 request = """INSERT INTO User
                              (name, surname, fathers_name, email)
-                             VALUES ('Bob', 'Smith', 'Viktorovich', 'bo@ya.ru'),
-                                    ('Kop', 'Johnson', 'Alexandrovich', 'ko@ya.ru'),
-                                    ('Rob', 'Miller', 'Yurievich', 'ro@ya.ru')
+                             VALUES
+                             ('Bob', 'Smith', 'Viktorovich', 'bo@ya.ru'),
+                             ('Kop', 'Johnson', 'Alexandrovich', 'ko@ya.ru'),
+                             ('Rob', 'Miller', 'Yurievich', 'ro@ya.ru')
                           """
 
                 self.connect_db.execute(request)
@@ -74,7 +74,6 @@ class PreparDb:
 
         except Exception:
             super_logger.error('Error add_user', exc_info=True)
-
 
     def create_book(self):
         """This method creates the 'Book' table."""
@@ -85,7 +84,7 @@ class PreparDb:
                              AUTOINCREMENT NOT NULL,
                              name TEXT NOT NULL,
                              author TEXT NOT NULL,
-                             isbn TEXT NOT NULL    
+                             isbn TEXT NOT NULL
                              )"""
 
                 self.connect_db.execute(request)
@@ -94,17 +93,21 @@ class PreparDb:
         except Exception:
             super_logger.error('Error create_book', exc_info=True)
 
-    
-
     def add_book(self):
         """This method fills in the 'book' table. """
         try:
             with self.connect_db:
-                request = """INSERT INTO Book
-                             (name, author, isbn)
-                             VALUES ('Идиот', 'Достоевский Ф.М.', '700-5-699-12014-7'),
-                                    ('Мастер и Маргарита', 'Булгаков М.А.', '800-5-699-12014-7'),
-                                    ('Доктор Живаго', 'Пастернак Б.Л.', '900-5-699-12014-7')
+                request = """
+                          INSERT INTO Book
+                          (name, author, isbn)
+                          VALUES
+                          ('Идиот', 'Достоевский Ф.М.', '700-5-699-12014-7'),
+
+                          ('Мастер и Маргарита', 'Булгаков М.А.',
+                          '800-5-699-12014-7'),
+
+                          ('Доктор Живаго', 'Пастернак Б.Л.',
+                          '900-5-699-12014-7')
                           """
 
                 self.connect_db.execute(request)
@@ -112,13 +115,6 @@ class PreparDb:
 
         except Exception:
             super_logger.error('Error add_book', exc_info=True)
-
-
-
-
-
-
-
 
     def create_shop(self):
         """This method creates the 'shop' table."""
@@ -139,18 +135,18 @@ class PreparDb:
         except Exception:
             super_logger.error('Error create_shop', exc_info=True)
 
-
-
     def add_shop(self):
         """This method fills in the 'shop' table. """
         try:
             with self.connect_db:
-                request = """INSERT INTO Shop
-                             (name, address, post_code)
-                             VALUES ('Beru', 'Пыжевский пер., 7, стр. 2, Москва', '140130'),
-                                    ('Ozon', 'ул. Ленинская Слобода, 26, стр. 5, Москва', '150120'),
-                                    ('AliExpress', 'Новоясеневский просп., 1Б, корп. 1, Москва', '130110')
-                            """
+                request = """
+                          INSERT INTO Shop
+                          (name, address, post_code)
+                          VALUES
+                          ('Beru', 'Пыжевская., 7, стр. 2, Москва', '140130'),
+                          ('Ozon', 'ул. Ленина, 26, стр. 5, Москва', '150120'),
+                          ('AliExpress', 'Топовая., 1Б, 1, Москва', '130110')
+                          """
 
                 self.connect_db.execute(request)
                 self.connect_db.commit()
@@ -158,19 +154,66 @@ class PreparDb:
         except Exception:
             super_logger.error('Error add_shop', exc_info=True)
 
+    def create_order_all(self):
+        """This method creates the 'OrderAll' table."""
+        try:
+            with self.connect_db:
+                request = """CREATE TABLE IF NOT EXISTS OrderAll(
+                             id_order_all INTEGER PRIMARY KEY
+                             AUTOINCREMENT NOT NULL,
+                             reg_data TEXT NOT NULL,
+                             id_user INTEGER NOT NULL,
+                             FOREIGN KEY (id_user)
+                             REFERENCES User(id_user)
+                             ON DELETE CASCADE
+                             )"""
 
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+
+        except Exception:
+            super_logger.error('Error create_order_all', exc_info=True)
+
+    def create_orderitem(self):
+        """This method creates the 'OrderItem' table."""
+        try:
+            with self.connect_db:
+                request = """CREATE TABLE IF NOT EXISTS OrderItem(
+                             id_OrderItem INTEGER PRIMARY KEY
+                             AUTOINCREMENT NOT NULL,
+
+                             book_quantity INTEGER NOT NULL,
+                             id_order_all INTEGER NOT NULL,
+                             id_book INTEGER NOT NULL,
+                             id_shop INTEGER NOT NULL,
+
+                             FOREIGN KEY (id_order_all)
+                             REFERENCES OrderAll(id_order_all)
+
+                             FOREIGN KEY (id_book)
+                             REFERENCES Book(id_book),
+
+                             FOREIGN KEY (id_shop)
+                             REFERENCES Shop(id_shop)
+                             )"""
+
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+
+        except Exception:
+            super_logger.error('Error create_orderitem', exc_info=True)
 
 
 def main():
     db = PreparDb()
-    # db.create_user()
-    # db.add_user()
-    # db.create_book()
-    # db.add_book()
-    # db.create_shop()
-    # db.add_shop()
-
-
+    db.create_user()
+    db.add_user()
+    db.create_book()
+    db.add_book()
+    db.create_shop()
+    db.add_shop()
+    db.create_order_all()
+    db.create_orderitem()
 
 
 if __name__ == "__main__":
