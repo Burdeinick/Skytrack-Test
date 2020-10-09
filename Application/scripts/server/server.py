@@ -21,13 +21,10 @@ async def get_user(request):
             data = await request.post()
             get_user = HandlerServer(data)
             response = await get_user.hand_get_user()
-
-        return web.json_response(response)
+            return web.json_response(response)
 
     except Exception:
         super_logger.error('Error get_user', exc_info=True)
-
-
 
 
 async def get_order_user(request):
