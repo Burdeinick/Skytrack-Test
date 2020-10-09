@@ -54,6 +54,7 @@ class PreparDb:
                              )"""
                 self.connect_db.execute(request)
                 self.connect_db.commit()
+
         except Exception:
             super_logger.error('Error create_user', exc_info=True)
 
@@ -102,10 +103,8 @@ class PreparDb:
                           (name, author, isbn)
                           VALUES
                           ('Fahrenheit 451', 'Ray Bradbury', '700-5-699-12014-7'),
-
                           ('The Sea Wolf', 'Jack London',
                           '800-5-699-12014-7'),
-
                           ('Essays', 'Ralph Waldo Emerson',
                           '900-5-699-12014-7')
                           """
@@ -266,9 +265,6 @@ class PreparDb:
 
         except Exception:
             super_logger.error('Error create_orderitem', exc_info=True)
-
-
-
 
     def add_orderItem(self):
         """This method fills in the 'OrderItem' table."""

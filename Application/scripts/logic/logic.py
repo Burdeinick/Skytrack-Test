@@ -92,7 +92,44 @@ class RequestDB:
             return orders
 
         except Exception:
-            super_logger.error('Error req_get_order_user', exc_info=True)         
+            super_logger.error('Error req_get_order_user', exc_info=True)
+
+
+    def req_get_shop(self, id_shop: str):
+        """The request that returns the shop or 'False'."""
+        try:
+            request_shop = self.session.query(self.Shop).filter(self.Shop.id_shop==id_shop)
+            for shop in request_shop:
+                resp_shop = {"shop_name": shop.name, 
+                             "shop_address":shop.address, 
+                             "shop_post_code": shop.post_code}
+                return resp_shop
+            return False
+
+        except Exception:
+            super_logger.error('Error req_get_shop', exc_info=True)
+
+    def req_get_assortiment(self, id_shop):
+        """The request returns the shop's assortiments."""
+        try:
+            query= self.session.query(self.Book,
+                                      self.Assortiment,
+                                      self.Shop).filter(self.Shop.id_shop==id_shop)
+
+            query = query.join(self.Assortiment, self.Book.id_book==self.Assortiment.id_book)
+            query = query.join(self.Shop, self.Shop.id_shop==self.Assortiment.id_shop)
+
+            assortiment = {"assortiment":[]}
+
+            for self.Book, self.Assortiment, self.Shop in query:
+                assortiment["assortiment"].append({"shop_name": self.Shop.name,
+                                                    "book_name": self.Book.name,
+                                                    "book_author": self.Book.author,
+                                                    "isbn": self.Book.isbn})
+            return assortiment
+
+        except Exception:
+            super_logger.error('Error req_get_assortiment', exc_info=True)
 
 
 class StatusResponse:
@@ -104,8 +141,10 @@ class StatusResponse:
     def __init__(self):
         """The constructor create the statuses."""
         self.invalid_data = {"Error": "Invalid data accepted"}
-        self.user_not_exit = {"Error": "The user does not exist"}
-        self.user_no_orders = {"Info": "The user has no orders"}
+        self.user_not_exist = {"Info": "The user does not exist"}
+        self.no_orders = {"Info": "The user has no orders"}
+        self.no_books = {"Info": "There are no books in this store"}
+        self.shop_not_exist = {"Info" : "The store does not exist"}
 
 
 class Checker:
@@ -155,7 +194,7 @@ class HandlerServer:
                 if user_exist:
                     return user_exist
                 else:
-                    return self.stat_resp.user_not_exit
+                    return self.stat_resp.user_not_exist
             else:
                 return self.stat_resp.invalid_data
 
@@ -178,12 +217,37 @@ class HandlerServer:
                     if orders.get("orders"):
                         return orders
                     else:
-                        return self.stat_resp.user_no_orders
+                        return self.stat_resp.no_orders
                 else:
-                    return self.stat_resp.user_not_exit
+                    return self.stat_resp.user_not_exist
             else:
                 return self.stat_resp.invalid_data
 
         except Exception:
             super_logger.error('Error hand_get_order_user', exc_info=True)      
 
+
+    async def hand_get_shop(self):
+        """The method is handler 'get_shop' 
+        of server.
+        
+        """
+        try:
+            expected_keys = ("id_shop",)
+            data_valid = self.checker.valid_data(self.data, expected_keys)
+            if data_valid:
+                id_shop = str(self.data[expected_keys[0]])
+                shop_exist =self.reqest_db.req_get_shop(id_shop)
+                if shop_exist:
+                    assortiment = self.reqest_db.req_get_assortiment(id_shop)
+                    if assortiment:
+                        return assortiment
+                    else:
+                        return self.stat_resp.no_books
+                else:
+                    return self.stat_resp.shop_not_exist
+            else:
+                return self.stat_resp.invalid_data
+
+        except Exception:
+            super_logger.error('Error hand_get_shop', exc_info=True)      

@@ -52,8 +52,10 @@ async def add_new_order(request):
 async def get_shop(request):
     try:
         async with aiohttp.ClientSession() as session:
-            pass
-        return web.json_response({'ok': True})
+            data = await request.post()
+            handler = HandlerServer(data)
+            response = await handler.hand_get_shop()
+            return web.json_response(response)
 
     except Exception:
         super_logger.error('Error get_shop', exc_info=True)
