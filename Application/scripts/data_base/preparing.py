@@ -101,12 +101,12 @@ class PreparDb:
                           INSERT INTO Book
                           (name, author, isbn)
                           VALUES
-                          ('Идиот', 'Достоевский Ф.М.', '700-5-699-12014-7'),
+                          ('Fahrenheit 451', 'Ray Bradbury', '700-5-699-12014-7'),
 
-                          ('Мастер и Маргарита', 'Булгаков М.А.',
+                          ('The Sea Wolf', 'Jack London',
                           '800-5-699-12014-7'),
 
-                          ('Доктор Живаго', 'Пастернак Б.Л.',
+                          ('Essays', 'Ralph Waldo Emerson',
                           '900-5-699-12014-7')
                           """
 
@@ -136,16 +136,16 @@ class PreparDb:
             super_logger.error('Error create_shop', exc_info=True)
 
     def add_shop(self):
-        """This method fills in the 'shop' table. """
+        """This method fills in the 'shop' table."""
         try:
             with self.connect_db:
                 request = """
                           INSERT INTO Shop
                           (name, address, post_code)
                           VALUES
-                          ('Beru', 'Пыжевская., 7, стр. 2, Москва', '140130'),
-                          ('Ozon', 'ул. Ленина, 26, стр. 5, Москва', '150120'),
-                          ('AliExpress', 'Топовая., 1Б, 1, Москва', '130110')
+                          ('Beru', 'California Springs, CA 92926 USA', '140130'),
+                          ('Ozon', 'Residence of the Russian Ambassador to the U.S. 6', '150120'),
+                          ('AliExpress', 'University of Cambridge 12', '130110')
                           """
 
                 self.connect_db.execute(request)
@@ -176,7 +176,7 @@ class PreparDb:
             super_logger.error('Error create_assortiment', exc_info=True)
 
     def add_assortiment(self):
-        """This method fills in the 'Assortiment' table. """
+        """This method fills in the 'Assortiment' table."""
         try:
             with self.connect_db:
                 request = """
@@ -217,6 +217,27 @@ class PreparDb:
         except Exception:
             super_logger.error('Error create_order_all', exc_info=True)
 
+
+    def add_order_all(self):
+        """This method fills in the 'OrderAll' table."""
+        try:
+            with self.connect_db:
+                request = """
+                          INSERT INTO OrderAll
+                          (reg_data, id_user)
+                          VALUES
+                          (CURRENT_DATE, 2),
+                          (CURRENT_DATE, 2),
+                          (CURRENT_DATE, 3)
+                          """
+
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+
+        except Exception:
+            super_logger.error(f'Error {__name__ }', exc_info=True)
+
+
     def create_orderitem(self):
         """This method creates the 'OrderItem' table."""
         try:
@@ -247,6 +268,31 @@ class PreparDb:
             super_logger.error('Error create_orderitem', exc_info=True)
 
 
+
+
+    def add_orderItem(self):
+        """This method fills in the 'OrderItem' table."""
+        try:
+            with self.connect_db:
+                request = """
+                          INSERT INTO OrderItem
+                          (id_order_all, 
+                          id_book, 
+                          book_quantity, 
+                          id_shop)
+                          VALUES
+                          (1, 2, 3, 3),
+                          (2, 3, 1, 1),
+                          (3, 1, 1, 1)
+                          """
+
+                self.connect_db.execute(request)
+                self.connect_db.commit()
+
+        except Exception:
+            super_logger.error(f'Error add_orderItem', exc_info=True)
+
+
 def main():
     db = PreparDb()
     db.create_user()
@@ -258,7 +304,9 @@ def main():
     db.create_assortiment()
     db.add_assortiment()
     db.create_order_all()
+    db.add_order_all()
     db.create_orderitem()
+    db.add_orderItem()
 
 
 if __name__ == "__main__":

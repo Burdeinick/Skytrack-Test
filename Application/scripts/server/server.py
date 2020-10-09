@@ -19,8 +19,8 @@ async def get_user(request):
     try:
         async with aiohttp.ClientSession() as session:
             data = await request.post()
-            get_user = HandlerServer(data)
-            response = await get_user.hand_get_user()
+            handler = HandlerServer(data)
+            response = await handler.hand_get_user()
             return web.json_response(response)
 
     except Exception:
@@ -30,8 +30,10 @@ async def get_user(request):
 async def get_order_user(request):
     try:
         async with aiohttp.ClientSession() as session:
-            pass
-        return web.json_response({'ok': True})
+            data = await request.post()
+            handler = HandlerServer(data)
+            response = await handler.hand_get_order_user()
+            return web.json_response(response)
 
     except Exception:
         super_logger.error('Error get_order_user', exc_info=True)
@@ -55,5 +57,3 @@ async def get_shop(request):
 
     except Exception:
         super_logger.error('Error get_shop', exc_info=True)
-
-

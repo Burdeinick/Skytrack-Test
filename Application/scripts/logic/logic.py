@@ -52,8 +52,8 @@ class RequestDB:
         self.OrderItem = Base.classes.OrderItem
 
 
-    def req_get_user(self, id_user):
-        """The request that returns the user and their "id"."""
+    def req_get_user(self, id_user: str):
+        """The request that returns the user or 'False'."""
         try:
             request_user = self.session.query(self.User).filter(self.User.id_user==id_user)
             for user in request_user:
@@ -67,6 +67,33 @@ class RequestDB:
         except Exception:
             super_logger.error('Error req_get_user', exc_info=True)
 
+    def req_get_order_user(self, id_user: str) -> dict:
+        """The request returns the user's orders."""
+        try:
+            query = self.session.query(self.User, 
+                                       self.OrderAll, 
+                                       self.Book, 
+                                       self.OrderItem, 
+                                       self.Shop).filter(self.User.id_user==id_user)
+
+            query = query.join(self.User, self.OrderAll.id_user==self.User.id_user)
+            query = query.join(self.OrderItem, self.OrderAll.id_order_all==self.OrderItem.id_order_all)
+            query = query.join(self.Shop, self.OrderItem.id_shop==self.Shop.id_shop)
+            query = query.join(self.Book, self.OrderItem.id_book==self.Book.id_book)             
+
+            orders = {"orders": []}
+
+            for self.User, self.OrderAll, self.Book, self.OrderItem, self.Shop in query:
+                orders["orders"].append({"user_name": self.User.name, 
+                                        "reg_data": self.OrderAll.reg_data, 
+                                        "book_name": self.Book.name,
+                                        "book_quantity": self.OrderItem.book_quantity,
+                                        "shop_name": self.Shop.name})
+            return orders
+
+        except Exception:
+            super_logger.error('Error req_get_order_user', exc_info=True)         
+
 
 class StatusResponse:
     """The class contains some statuses
@@ -78,6 +105,7 @@ class StatusResponse:
         """The constructor create the statuses."""
         self.invalid_data = {"Error": "Invalid data accepted"}
         self.user_not_exit = {"Error": "The user does not exist"}
+        self.user_no_orders = {"Info": "The user has no orders"}
 
 
 class Checker:
@@ -117,12 +145,12 @@ class HandlerServer:
         self.data = data
 
     async def hand_get_user(self):
-        """The method handle 'get_user' of server."""
+        """The method is handler 'get_user' of server."""
         try:
             expected_keys = ("id_user",)
             data_valid = self.checker.valid_data(self.data, expected_keys)
             if data_valid:
-                id_user = int(self.data[expected_keys[0]])
+                id_user = str(self.data[expected_keys[0]])
                 user_exist = self.reqest_db.req_get_user(id_user)
                 if user_exist:
                     return user_exist
@@ -134,4 +162,28 @@ class HandlerServer:
         except Exception:
             super_logger.error('Error hand_get_user', exc_info=True)
 
+    async def hand_get_order_user(self):
+        """The method is handler 'get_order_user' 
+        of server.
+        
+        """
+        try:
+            expected_keys = ("id_user",)
+            data_valid = self.checker.valid_data(self.data, expected_keys)
+            if data_valid:
+                id_user = str(self.data[expected_keys[0]])
+                user_exist = self.reqest_db.req_get_user(id_user)
+                if user_exist:
+                    orders = self.reqest_db.req_get_order_user(id_user)
+                    if orders.get("orders"):
+                        return orders
+                    else:
+                        return self.stat_resp.user_no_orders
+                else:
+                    return self.stat_resp.user_not_exit
+            else:
+                return self.stat_resp.invalid_data
+
+        except Exception:
+            super_logger.error('Error hand_get_order_user', exc_info=True)      
 
