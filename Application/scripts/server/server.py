@@ -39,14 +39,42 @@ async def get_order_user(request):
         super_logger.error('Error get_order_user', exc_info=True)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 async def add_new_order(request):
     try:
         async with aiohttp.ClientSession() as session:
-            pass
-        return web.json_response({'ok': True})
+            data = await request.post()
+            handler = HandlerServer(data)
+            response = await handler.hand_add_new_order()
+            return web.json_response(response)
 
     except Exception:
         super_logger.error('Error add_new_order', exc_info=True)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 async def get_shop(request):

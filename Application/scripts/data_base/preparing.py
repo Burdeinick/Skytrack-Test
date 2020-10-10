@@ -225,9 +225,9 @@ class PreparDb:
                           INSERT INTO OrderAll
                           (reg_data, id_user)
                           VALUES
-                          (CURRENT_DATE, 2),
-                          (CURRENT_DATE, 2),
-                          (CURRENT_DATE, 3)
+                          (CURRENT_TIMESTAMP, 2),
+                          (CURRENT_TIMESTAMP, 2),
+                          (CURRENT_TIMESTAMP, 3)
                           """
 
                 self.connect_db.execute(request)

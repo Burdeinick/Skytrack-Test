@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 
 from logger.log import MyLogging
 
@@ -131,6 +132,72 @@ class RequestDB:
         except Exception:
             super_logger.error('Error req_get_assortiment', exc_info=True)
 
+    def req_get_book_shop(self, id_shop: str, id_book):
+        """The request returns the book in shop or False."""
+        try:
+            query = self.session.query(self.Book,
+                                      self.Assortiment,
+                                      self.Shop).filter(self.Shop.id_shop==id_shop).filter(self.Book.id_book==id_book)
+
+            query = query.join(self.Assortiment, self.Book.id_book==self.Assortiment.id_book)
+            query = query.join(self.Shop, self.Shop.id_shop==self.Assortiment.id_shop)
+
+            book_in_shop = {}
+
+            for self.Book, self.Assortiment, self.Shop in query:
+                book_in_shop = {"shop_name": self.Shop.name,
+                                "book_name": self.Book.name,
+                                "book_author": self.Book.author,
+                                "isbn": self.Book.isbn}
+                return book_in_shop
+            return False
+
+        except Exception:
+            super_logger.error('Error req_get_book_shop', exc_info=True)       
+
+
+
+
+    def req_add_order_all(self, id_user: str):
+        """The request in DB to add data to the Order All table."""
+        try:
+            new_order_all = self.OrderAll(reg_data=func.current_timestamp(), 
+                                          id_user=id_user)
+
+            self.session.add(new_order_all)
+            self.session.commit()
+            return True
+
+        except Exception:
+            super_logger.error('Error req_add_order_all', exc_info=True) 
+            return False      
+
+
+    # def req_add_orderitem(self):
+    #     """Request in DB to add data to the OrderItem table."""
+    #     try:
+    #         pass
+    #     except Exception:
+    #         super_logger.error('Error req_add_order_all', exc_info=True)       
+
+
+
+    def req_last_order_all(self):
+        """The request in DB for getting last id_order_all."""
+        try:
+            query = self.session.query(func.max(self.OrderAll.id_order_all))
+
+            query  #TODO!!!
+            return({"Ok":"Ok"})
+
+        except Exception:
+            super_logger.error('Error req_last_order_all', exc_info=True) 
+            return False   
+
+
+
+
+
 
 class StatusResponse:
     """The class contains some statuses
@@ -251,3 +318,37 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error hand_get_shop', exc_info=True)      
+
+
+
+    async def hand_add_new_order(self):
+        """The method is handler 'add_new_order' 
+        of server.
+        
+        """
+        try:
+            expected_keys = ("id_user",
+                             "id_shop",
+                             "id_book",
+                             "book_quantity")
+
+            data_valid = self.checker.valid_data(self.data, expected_keys)
+            if data_valid:
+                id_user = str(self.data[expected_keys[0]])
+                user_exist = self.reqest_db.req_get_user(id_user)
+                if user_exist:
+                    id_shop = str(self.data[expected_keys[1]])
+                    shop_exist =self.reqest_db.req_get_shop(id_shop)
+                    if shop_exist:
+                        id_book = str(self.data[expected_keys[2]])
+                        book_in_shop = self.reqest_db.req_get_book_shop(id_shop, id_book)
+                        if book_in_shop:
+                           add_order_all = self.reqest_db.req_add_order_all(id_user)
+                           last_id_order_all = self.reqest_db.req_last_order_all()
+                           return last_id_order_all
+                        #    if last_id_order_all:
+
+
+
+        except Exception:
+            super_logger.error('Error hand_add_new_order', exc_info=True)

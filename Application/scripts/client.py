@@ -31,11 +31,28 @@ def get_shop():
     print(a.content)
 
 
+def add_new_order():
+    """For testing adding 
+    new order.
+    
+    """
+    url = r'http://127.0.0.1:5000/add_new_order'
+    data = {"id_shop": "1",
+            "id_user": "1",
+            "id_book": "1",
+            "book_quantity": "3"}
+
+
+    a = requests.put(url, data=data)
+    print(a.content)
+
 
 def main():
     # get_user()
     # get_order_user()
-    get_shop()
+    # get_shop()
+    add_new_order()
+
 
 
 if __name__ == "__main__":
