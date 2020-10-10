@@ -14,7 +14,7 @@ class ConnectDB:
     """Class for connecting the database."""
     def __init__(self):
         db_connection_str = 'sqlite:///trad_plat.db'
-        self.engine = create_engine(db_connection_str, echo = True)
+        self.engine = create_engine(db_connection_str, echo=True)
         self._cur_ = self.engine
         Session = sessionmaker(bind=self._cur_)
         self.session = Session()
@@ -36,10 +36,10 @@ class RequestDB:
         self.session = ConnectDB().session
         metadata = MetaData()
         metadata.reflect(self.engine, only=['User',
-                                            'Book', 
-                                            'Shop', 
-                                            'Assortiment', 
-                                            'OrderAll', 
+                                            'Book',
+                                            'Shop',
+                                            'Assortiment',
+                                            'OrderAll',
                                             'OrderItem'])
 
         Base = automap_base(metadata=metadata)
@@ -54,12 +54,13 @@ class RequestDB:
     def req_get_user(self, id_user: str):
         """The request that returns the user or 'False'."""
         try:
-            request_user = self.session.query(self.User).filter(self.User.id_user==id_user)
+            request_user = self.session.query(self.User) \
+                               .filter(self.User.id_user == id_user)
             for user in request_user:
-                resp_user = {"name": user.name, 
-                            "surname": user.surname, 
-                            "fathers_name": user.fathers_name, 
-                            "email": user.email}
+                resp_user = {"name": user.name,
+                             "surname": user.surname,
+                             "fathers_name": user.fathers_name,
+                             "email": user.email}
                 return resp_user
             return False
 
@@ -69,25 +70,34 @@ class RequestDB:
     def req_get_order_user(self, id_user: str) -> dict:
         """The request returns the user's orders."""
         try:
-            query = self.session.query(self.User, 
-                                       self.OrderAll, 
-                                       self.Book, 
-                                       self.OrderItem, 
-                                       self.Shop).filter(self.User.id_user==id_user)
+            query = self.session.query(self.User,
+                                       self.OrderAll,
+                                       self.Book,
+                                       self.OrderItem,
+                                       self.Shop)   \
+                                           .filter(self.User.id_user ==
+                                                   id_user)
 
-            query = query.join(self.User, self.OrderAll.id_user==self.User.id_user)
-            query = query.join(self.OrderItem, self.OrderAll.id_order_all==self.OrderItem.id_order_all)
-            query = query.join(self.Shop, self.OrderItem.id_shop==self.Shop.id_shop)
-            query = query.join(self.Book, self.OrderItem.id_book==self.Book.id_book)             
+            query = query.join(self.User,
+                               self.OrderAll.id_user == self.User.id_user)
+            query = query.join(self.OrderItem,
+                               self.OrderAll.id_order_all ==
+                               self.OrderItem.id_order_all)
+
+            query = query.join(self.Shop,
+                               self.OrderItem.id_shop == self.Shop.id_shop)
+
+            query = query.join(self.Book,
+                               self.OrderItem.id_book == self.Book.id_book)
 
             orders = {"orders": []}
 
             for self.User, self.OrderAll, self.Book, self.OrderItem, self.Shop in query:
-                orders["orders"].append({"user_name": self.User.name, 
-                                        "reg_data": self.OrderAll.reg_data, 
-                                        "book_name": self.Book.name,
-                                        "book_quantity": self.OrderItem.book_quantity,
-                                        "shop_name": self.Shop.name})
+                orders["orders"].append({"user_name": self.User.name,
+                                         "reg_data": self.OrderAll.reg_data,
+                                         "book_name": self.Book.name,
+                                         "book_quantity": self.OrderItem.book_quantity,
+                                         "shop_name": self.Shop.name})
             return orders
 
         except Exception:
@@ -96,10 +106,11 @@ class RequestDB:
     def req_get_shop(self, id_shop: str):
         """The request that returns the shop or 'False'."""
         try:
-            request_shop = self.session.query(self.Shop).filter(self.Shop.id_shop==id_shop)
+            request_shop = self.session.query(self.Shop)    \
+                               .filter(self.Shop.id_shop == id_shop)
             for shop in request_shop:
-                resp_shop = {"shop_name": shop.name, 
-                             "shop_address":shop.address, 
+                resp_shop = {"shop_name": shop.name,
+                             "shop_address": shop.address,
                              "shop_post_code": shop.post_code}
                 return resp_shop
             return False
@@ -110,20 +121,23 @@ class RequestDB:
     def req_get_assortiment(self, id_shop):
         """The request returns the shop's assortiments."""
         try:
-            query= self.session.query(self.Book,
-                                      self.Assortiment,
-                                      self.Shop).filter(self.Shop.id_shop==id_shop)
+            query = self.session    \
+                .query(self.Book,
+                       self.Assortiment,
+                       self.Shop).filter(self.Shop.id_shop == id_shop)
 
-            query = query.join(self.Assortiment, self.Book.id_book==self.Assortiment.id_book)
-            query = query.join(self.Shop, self.Shop.id_shop==self.Assortiment.id_shop)
+            query = query.join(self.Assortiment,
+                               self.Book.id_book == self.Assortiment.id_book)
+            query = query.join(self.Shop,
+                               self.Shop.id_shop == self.Assortiment.id_shop)
 
-            assortiment = {"assortiment":[]}
+            assortiment = {"assortiment": []}
 
             for self.Book, self.Assortiment, self.Shop in query:
                 assortiment["assortiment"].append({"shop_name": self.Shop.name,
-                                                    "book_name": self.Book.name,
-                                                    "book_author": self.Book.author,
-                                                    "isbn": self.Book.isbn})
+                                                   "book_name": self.Book.name,
+                                                   "book_author": self.Book.author,
+                                                   "isbn": self.Book.isbn})
             return assortiment
 
         except Exception:
@@ -133,11 +147,14 @@ class RequestDB:
         """The request returns the book in shop or False."""
         try:
             query = self.session.query(self.Book,
-                                      self.Assortiment,
-                                      self.Shop).filter(self.Shop.id_shop==id_shop).filter(self.Book.id_book==id_book)
+                                       self.Assortiment,
+                                       self.Shop).filter(self.Shop.id_shop == id_shop)  \
+                                       .filter(self.Book.id_book == id_book)
 
-            query = query.join(self.Assortiment, self.Book.id_book==self.Assortiment.id_book)
-            query = query.join(self.Shop, self.Shop.id_shop==self.Assortiment.id_shop)
+            query = query.join(self.Assortiment,
+                               self.Book.id_book == self.Assortiment.id_book)
+            query = query.join(self.Shop,
+                               self.Shop.id_shop == self.Assortiment.id_shop)
 
             book_in_shop = {}
 
@@ -150,22 +167,23 @@ class RequestDB:
             return False
 
         except Exception:
-            super_logger.error('Error req_get_book_shop', exc_info=True)       
+            super_logger.error('Error req_get_book_shop', exc_info=True)
 
     def req_add_order_all(self, id_user: str, id_book, book_quantity, id_shop):
-        """The request in DB to add data to 
+        """The request in DB to add data to
         the OrderAll and OrderItem tables.
-        
+
         """
         try:
-            new_order_all = self.OrderAll(reg_data=func.current_timestamp(), 
+            new_order_all = self.OrderAll(reg_data=func.current_timestamp(),
                                           id_user=id_user)
 
-            last_order_all_id = self.session.query(func.max(self.OrderAll.id_order_all))
+            last_order_all_id = self.session    \
+                                    .query(func.max(self.OrderAll.id_order_all))
 
             new_orderitem = self.OrderItem(id_order_all=last_order_all_id,
                                            id_book=id_book,
-                                           book_quantity=book_quantity, 
+                                           book_quantity=book_quantity,
                                            id_shop=id_shop)
 
             self.session.add_all([new_order_all, new_orderitem])
@@ -173,8 +191,8 @@ class RequestDB:
             return True
 
         except Exception:
-            super_logger.error('Error req_add_order_all', exc_info=True) 
-            return False 
+            super_logger.error('Error req_add_order_all', exc_info=True)
+            return False
 
 
 class StatusResponse:
@@ -189,7 +207,7 @@ class StatusResponse:
         self.user_not_exist = {"Info": "The user does not exist"}
         self.no_orders = {"Info": "The user has no orders"}
         self.no_books = {"Info": "There are no books in this store"}
-        self.shop_not_exist = {"Info" : "The store does not exist"}
+        self.shop_not_exist = {"Info": "The store does not exist"}
         self.order_added = {"Ok": "The order added successfully"}
         self.order_no_added = {"Error": "The order is not added"}
 
@@ -209,7 +227,7 @@ class Checker:
         """
         try:
             for key in keys:
-                id_user = str(data.get(key)) if key in data else None 
+                id_user = str(data.get(key)) if key in data else None
                 if id_user and id_user.isalnum():
                     continue
                 else:
@@ -219,7 +237,7 @@ class Checker:
         except Exception:
             super_logger.error('Error valid_data', exc_info=True)
 
-    def valid_number(self, value: str) -> bool:
+    def valid_number(self, value: str):
         """The method checks whether the number is valid."""
         try:
             if value.isdigit():
@@ -257,9 +275,9 @@ class HandlerServer:
             super_logger.error('Error hand_get_user', exc_info=True)
 
     async def hand_get_order_user(self):
-        """The method is handler 'get_order_user' 
+        """The method is handler 'get_order_user'
         of server.
-        
+
         """
         try:
             expected_keys = ("id_user",)
@@ -279,19 +297,19 @@ class HandlerServer:
                 return self.stat_resp.invalid_data
 
         except Exception:
-            super_logger.error('Error hand_get_order_user', exc_info=True)      
+            super_logger.error('Error hand_get_order_user', exc_info=True)
 
     async def hand_get_shop(self):
-        """The method is handler 'get_shop' 
+        """The method is handler 'get_shop'
         of server.
-        
+
         """
         try:
             expected_keys = ("id_shop",)
             data_valid = self.checker.valid_data(self.data, expected_keys)
             if data_valid:
                 id_shop = str(self.data[expected_keys[0]])
-                shop_exist =self.reqest_db.req_get_shop(id_shop)
+                shop_exist = self.reqest_db.req_get_shop(id_shop)
                 if shop_exist:
                     assortiment = self.reqest_db.req_get_assortiment(id_shop)
                     if assortiment:
@@ -304,12 +322,12 @@ class HandlerServer:
                 return self.stat_resp.invalid_data
 
         except Exception:
-            super_logger.error('Error hand_get_shop', exc_info=True)      
+            super_logger.error('Error hand_get_shop', exc_info=True)
 
     async def hand_add_new_order(self):
-        """The method is handler 'add_new_order' 
+        """The method is handler 'add_new_order'
         of server.
-        
+
         """
         try:
             expected_keys = ("id_user",
@@ -323,7 +341,7 @@ class HandlerServer:
                 user_exist = self.reqest_db.req_get_user(id_user)
                 if user_exist:
                     id_shop = str(self.data[expected_keys[1]])
-                    shop_exist =self.reqest_db.req_get_shop(id_shop)
+                    shop_exist = self.reqest_db.req_get_shop(id_shop)
                     if shop_exist:
                         id_book = str(self.data[expected_keys[2]])
                         book_in_shop = self.reqest_db.req_get_book_shop(id_shop, id_book)
@@ -331,10 +349,10 @@ class HandlerServer:
                             book_quantity = str(self.data[expected_keys[3]])
                             valid_book_quantity = self.checker.valid_number(book_quantity)
                             if valid_book_quantity:
-                                add_order = self.reqest_db.req_add_order_all(id_user, 
-                                                                            id_book, 
-                                                                            book_quantity, 
-                                                                            id_shop)
+                                add_order = self.reqest_db.req_add_order_all(id_user,
+                                                                             id_book,
+                                                                             book_quantity,
+                                                                             id_shop)
                                 if add_order:
                                     return self.stat_resp.order_added
                                 else:
@@ -348,7 +366,7 @@ class HandlerServer:
                 else:
                     return self.stat_resp.user_not_exist
             else:
-                return self.stat_resp.invalid_data        
+                return self.stat_resp.invalid_data
 
         except Exception:
             super_logger.error('Error hand_add_new_order', exc_info=True)

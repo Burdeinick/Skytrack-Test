@@ -25,7 +25,7 @@ def main():
                            web.post('/get_order_user', get_order_user),
                            web.put('/add_new_order', add_new_order),
                            web.post('/get_shop', get_shop)])
-    web.run_app(app, host=host, port=port) 
+    web.run_app(app, host=host, port=port)
 
 
 if __name__ == "__main__":
