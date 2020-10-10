@@ -107,8 +107,6 @@ def add_new_order():
             "id_user": "1",
             "id_book": "2",
             "book_quantity": "2"}
-
-
     a = requests.put(url, data=data)
     print(a.content)
 ```
