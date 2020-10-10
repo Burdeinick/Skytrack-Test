@@ -12,6 +12,7 @@ def get_user():
 def get_order_user():
     """For testing geting order
     of user on id_user.
+
     """
     url = r'http://127.0.0.1:5000/get_order_user'
     data = {"id_user": "1"}
@@ -22,6 +23,7 @@ def get_order_user():
 def get_shop():
     """For testing geting assortiment
     shop on id_shop.
+
     """
     url = r'http://127.0.0.1:5000/get_shop'
     data = {"id_shop": "1"}
@@ -32,6 +34,7 @@ def get_shop():
 def add_new_order():
     """For testing adding
     new order.
+
     """
     url = r'http://127.0.0.1:5000/add_new_order'
     data = {"id_shop": "2",
