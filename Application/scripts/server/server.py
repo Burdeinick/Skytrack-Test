@@ -28,6 +28,7 @@ async def get_user(request):
 
 
 async def get_order_user(request):
+    """The method handle 'get_order_user' route requests."""
     try:
         async with aiohttp.ClientSession() as session:
             data = await request.post()
@@ -39,21 +40,8 @@ async def get_order_user(request):
         super_logger.error('Error get_order_user', exc_info=True)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 async def add_new_order(request):
+    """The method handle 'add_new_order' route requests."""
     try:
         async with aiohttp.ClientSession() as session:
             data = await request.post()
@@ -65,19 +53,8 @@ async def add_new_order(request):
         super_logger.error('Error add_new_order', exc_info=True)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 async def get_shop(request):
+    """The method handle 'get_shop' route requests."""
     try:
         async with aiohttp.ClientSession() as session:
             data = await request.post()

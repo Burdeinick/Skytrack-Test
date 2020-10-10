@@ -15,7 +15,7 @@ def get_order_user():
     
     """
     url = r'http://127.0.0.1:5000/get_order_user'
-    data = {"id_user": "3"}
+    data = {"id_user": "1"}
     a = requests.post(url, data=data)
     print(a.content)
 
@@ -37,10 +37,10 @@ def add_new_order():
     
     """
     url = r'http://127.0.0.1:5000/add_new_order'
-    data = {"id_shop": "1",
+    data = {"id_shop": "2",
             "id_user": "1",
-            "id_book": "1",
-            "book_quantity": "3"}
+            "id_book": "2",
+            "book_quantity": "2"}
 
 
     a = requests.put(url, data=data)
@@ -51,8 +51,7 @@ def main():
     # get_user()
     # get_order_user()
     # get_shop()
-    add_new_order()
-
+    # add_new_order()
 
 
 if __name__ == "__main__":

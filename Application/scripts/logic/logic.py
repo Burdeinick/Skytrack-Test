@@ -155,48 +155,29 @@ class RequestDB:
         except Exception:
             super_logger.error('Error req_get_book_shop', exc_info=True)       
 
-
-
-
-    def req_add_order_all(self, id_user: str):
-        """The request in DB to add data to the Order All table."""
+    def req_add_order_all(self, id_user: str, id_book, book_quantity, id_shop):
+        """The request in DB to add data to 
+        the OrderAll and OrderItem tables.
+        
+        """
         try:
             new_order_all = self.OrderAll(reg_data=func.current_timestamp(), 
                                           id_user=id_user)
 
-            self.session.add(new_order_all)
+            last_order_all_id = self.session.query(func.max(self.OrderAll.id_order_all))
+
+            new_orderitem = self.OrderItem(id_order_all=last_order_all_id,
+                                           id_book=id_book,
+                                           book_quantity=book_quantity, 
+                                           id_shop=id_shop)
+
+            self.session.add_all([new_order_all, new_orderitem])
             self.session.commit()
             return True
 
         except Exception:
             super_logger.error('Error req_add_order_all', exc_info=True) 
-            return False      
-
-
-    # def req_add_orderitem(self):
-    #     """Request in DB to add data to the OrderItem table."""
-    #     try:
-    #         pass
-    #     except Exception:
-    #         super_logger.error('Error req_add_order_all', exc_info=True)       
-
-
-
-    def req_last_order_all(self):
-        """The request in DB for getting last id_order_all."""
-        try:
-            query = self.session.query(func.max(self.OrderAll.id_order_all))
-
-            query  #TODO!!!
-            return({"Ok":"Ok"})
-
-        except Exception:
-            super_logger.error('Error req_last_order_all', exc_info=True) 
-            return False   
-
-
-
-
+            return False 
 
 
 class StatusResponse:
@@ -212,6 +193,9 @@ class StatusResponse:
         self.no_orders = {"Info": "The user has no orders"}
         self.no_books = {"Info": "There are no books in this store"}
         self.shop_not_exist = {"Info" : "The store does not exist"}
+        self.order_added = {"Ok": "The order added successfully"}
+        self.order_no_added = {"Error": "The order is not added"}
+  
 
 
 class Checker:
@@ -239,6 +223,16 @@ class Checker:
 
         except Exception:
             super_logger.error('Error valid_data', exc_info=True)
+
+    def valid_number(self, value: str) -> bool:
+        """The method checks whether the number is valid."""
+        try:
+            if value.isdigit():
+                if int(value) > 0:
+                    return True
+
+        except Exception:
+            super_logger.error('Error valid_number', exc_info=True)
 
 
 class HandlerServer:
@@ -320,7 +314,6 @@ class HandlerServer:
             super_logger.error('Error hand_get_shop', exc_info=True)      
 
 
-
     async def hand_add_new_order(self):
         """The method is handler 'add_new_order' 
         of server.
@@ -343,12 +336,27 @@ class HandlerServer:
                         id_book = str(self.data[expected_keys[2]])
                         book_in_shop = self.reqest_db.req_get_book_shop(id_shop, id_book)
                         if book_in_shop:
-                           add_order_all = self.reqest_db.req_add_order_all(id_user)
-                           last_id_order_all = self.reqest_db.req_last_order_all()
-                           return last_id_order_all
-                        #    if last_id_order_all:
-
-
+                            book_quantity = str(self.data[expected_keys[3]])
+                            valid_book_quantity = self.checker.valid_number(book_quantity)
+                            if valid_book_quantity:
+                                add_order = self.reqest_db.req_add_order_all(id_user, 
+                                                                            id_book, 
+                                                                            book_quantity, 
+                                                                            id_shop)
+                                if add_order:
+                                    return self.stat_resp.order_added
+                                else:
+                                    return self.stat_resp.order_no_added
+                            else:
+                                return self.stat_resp.invalid_data
+                        else:
+                            return self.stat_resp.no_books
+                    else:
+                        return self.stat_resp.shop_not_exist
+                else:
+                    return self.stat_resp.user_not_exist
+            else:
+                return self.stat_resp.invalid_data        
 
         except Exception:
             super_logger.error('Error hand_add_new_order', exc_info=True)
