@@ -22,7 +22,7 @@ def get_order_user():
 
 def get_shop():
     """For testing geting assortiment 
-    of user on id_shop.
+    shop on id_shop.
     
     """
     url = r'http://127.0.0.1:5000/get_shop'
