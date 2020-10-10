@@ -52,7 +52,7 @@ class PreparDb:
                              email TEXT NOT NULL,
                              UNIQUE(email)
                              )"""
-                             
+
                 self.connect_db.execute(request)
                 self.connect_db.commit()
 
@@ -103,7 +103,8 @@ class PreparDb:
                           INSERT INTO Book
                           (name, author, isbn)
                           VALUES
-                          ('Fahrenheit 451', 'Ray Bradbury', '700-5-699-12014-7'),
+                          ('Fahrenheit 451', 'Ray Bradbury',
+                          '700-5-699-12014-7'),
                           ('The Sea Wolf', 'Jack London',
                           '800-5-699-12014-7'),
                           ('Essays', 'Ralph Waldo Emerson',
@@ -143,9 +144,15 @@ class PreparDb:
                           INSERT INTO Shop
                           (name, address, post_code)
                           VALUES
-                          ('Beru', 'California Springs, CA 92926 USA', '140130'),
-                          ('Ozon', 'Residence of the Russian Ambassador to the U.S. 6', '150120'),
-                          ('AliExpress', 'University of Cambridge 12', '130110')
+                          ('Beru', 'California Springs, CA 92926 USA',
+                          '140130'),
+
+                          ('Ozon',
+                          'Residence of the Russian Ambassador to the U.S. 6',
+                          '150120'),
+
+                          ('AliExpress', 'University of Cambridge 12',
+                          '130110')
                           """
 
                 self.connect_db.execute(request)
@@ -217,7 +224,6 @@ class PreparDb:
         except Exception:
             super_logger.error('Error create_order_all', exc_info=True)
 
-
     def add_order_all(self):
         """This method fills in the 'OrderAll' table."""
         try:
@@ -236,7 +242,6 @@ class PreparDb:
 
         except Exception:
             super_logger.error(f'Error {__name__ }', exc_info=True)
-
 
     def create_orderitem(self):
         """This method creates the 'OrderItem' table."""
@@ -273,9 +278,9 @@ class PreparDb:
             with self.connect_db:
                 request = """
                           INSERT INTO OrderItem
-                          (id_order_all, 
-                          id_book, 
-                          book_quantity, 
+                          (id_order_all,
+                          id_book,
+                          book_quantity,
                           id_shop)
                           VALUES
                           (1, 2, 3, 3),
