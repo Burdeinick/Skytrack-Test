@@ -40,9 +40,9 @@ API, отображающее мою способность(или неспос�
 Таблица Shop:
 ```
 (id_shop, name, address, post_code)
-('Beru', 'California Springs, CA 92926 USA', '140130'),
-('Ozon', 'Residence of the Russian Ambassador to the U.S. 6', '150120'),
-('AliExpress', 'University of Cambridge 12', '130110')
+(1, 'Beru', 'California Springs, CA 92926 USA', '140130'),
+(2, 'Ozon', 'Residence of the Russian Ambassador to the U.S. 6', '150120'),
+(3, 'AliExpress', 'University of Cambridge 12', '130110')
 ```
 Таблица Assortiment:
 
