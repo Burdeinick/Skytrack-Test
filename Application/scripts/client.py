@@ -48,10 +48,10 @@ def add_new_order():
 
 
 def main():
-    # get_user()
-    # get_order_user()
-    # get_shop()
-    # add_new_order()
+    get_user()
+    get_order_user()
+    get_shop()
+    add_new_order()
 
 
 if __name__ == "__main__":
