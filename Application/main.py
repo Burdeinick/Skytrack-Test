@@ -12,10 +12,10 @@ def get_config_db() -> tuple:
     with open('Application/config.json') as config:
         json_str = config.read()
         json_str = json.loads(json_str)
-
         host = json_str['server']['host']
         port = json_str['server']['port']
         return (host, port)
+
 
 host, port = get_config_db()
 

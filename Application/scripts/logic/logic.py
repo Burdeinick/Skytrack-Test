@@ -13,7 +13,6 @@ super_logger = MyLogging().setup_logger('logic',
 class ConnectDB:
     """Class for connecting the database."""
     def __init__(self):
-        """ """
         db_connection_str = 'sqlite:///trad_plat.db'
         self.engine = create_engine(db_connection_str, echo = True)
         self._cur_ = self.engine
@@ -51,7 +50,6 @@ class RequestDB:
         self.Assortiment = Base.classes.Assortiment
         self.OrderAll = Base.classes.OrderAll
         self.OrderItem = Base.classes.OrderItem
-
 
     def req_get_user(self, id_user: str):
         """The request that returns the user or 'False'."""
@@ -94,7 +92,6 @@ class RequestDB:
 
         except Exception:
             super_logger.error('Error req_get_order_user', exc_info=True)
-
 
     def req_get_shop(self, id_shop: str):
         """The request that returns the shop or 'False'."""
@@ -195,7 +192,6 @@ class StatusResponse:
         self.shop_not_exist = {"Info" : "The store does not exist"}
         self.order_added = {"Ok": "The order added successfully"}
         self.order_no_added = {"Error": "The order is not added"}
-  
 
 
 class Checker:
@@ -204,7 +200,6 @@ class Checker:
 
     """
     def __init__(self):
-        """ """
         pass
 
     def valid_data(self, data: dict, keys: tuple) -> bool:
@@ -238,7 +233,6 @@ class Checker:
 class HandlerServer:
     """The class can to process requests of server."""
     def __init__(self, data: dict):
-        """ """
         self.reqest_db = RequestDB()
         self.stat_resp = StatusResponse()
         self.checker = Checker()
@@ -287,7 +281,6 @@ class HandlerServer:
         except Exception:
             super_logger.error('Error hand_get_order_user', exc_info=True)      
 
-
     async def hand_get_shop(self):
         """The method is handler 'get_shop' 
         of server.
@@ -312,7 +305,6 @@ class HandlerServer:
 
         except Exception:
             super_logger.error('Error hand_get_shop', exc_info=True)      
-
 
     async def hand_add_new_order(self):
         """The method is handler 'add_new_order' 

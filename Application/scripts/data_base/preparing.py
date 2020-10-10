@@ -52,6 +52,7 @@ class PreparDb:
                              email TEXT NOT NULL,
                              UNIQUE(email)
                              )"""
+                             
                 self.connect_db.execute(request)
                 self.connect_db.commit()
 

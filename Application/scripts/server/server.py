@@ -1,8 +1,7 @@
-import aiohttp
-from aiohttp import web, request
-
 import sys
 sys.path.insert(0, 'Application')
+import aiohttp
+from aiohttp import web, request
 from logger.log import MyLogging
 from scripts.logic.logic import HandlerServer
 
