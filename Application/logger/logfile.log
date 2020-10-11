@@ -1,0 +1,11 @@
+2020-10-11 11:59:28,755 ERROR Error get_order_user
+Traceback (most recent call last):
+  File "/home/alexandr/Документы/Python/GIT/Skytrack-Test/Application/scripts/server/server.py", line 32, in get_order_user
+    handler = HandlerServer(data)
+  File "Application/scripts/logic/logic.py", line 254, in __init__
+    self.reqest_db = RequestDB()
+  File "Application/scripts/logic/logic.py", line 38, in __init__
+    metadata.reflect(self.engine, only=['User',
+  File "/home/alexandr/.local/lib/python3.8/site-packages/sqlalchemy/sql/schema.py", line 4498, in reflect
+    raise exc.InvalidRequestError(
+sqlalchemy.exc.InvalidRequestError: Could not reflect: requested table(s) not available in Engine(sqlite:///trad_plat.db): (User, Book, Shop, OrderAll, OrderItem)
